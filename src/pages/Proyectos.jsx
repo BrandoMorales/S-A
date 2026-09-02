@@ -4,67 +4,80 @@ const proyectos = [
   {
     categoria: "Infraestructura",
     titulo: "Intersección a tres niveles Neomundo",
-    ubicacion: "Bucaramanga"
+    ubicacion: "Bucaramanga",
+    imagen: "/images/Fotos/IMG_20190626_120741352_HDR.jpg"
   },
   {
     categoria: "Infraestructura",
     titulo: "Intersección a tres niveles Monumento al Campesino",
-    ubicacion: "Pasto"
+    ubicacion: "Pasto",
+    imagen: "/images/Fotos/IMG_20190626_120642731_HDR.jpg"
   },
   {
     categoria: "Infraestructura",
     titulo: "Interconector glorieta Calle 6 con Carrera 10",
-    ubicacion: "Bogotá"
+    ubicacion: "Bogotá",
+    imagen: "/images/Fotos/IMG_20190626_113903953_HDR.jpg"
   },
   {
     categoria: "Puentes",
     titulo: "Puente El Embalse del Sisga",
-    ubicacion: "Briceño – Tunja – Sogamoso"
+    ubicacion: "Briceño – Tunja – Sogamoso",
+    imagen: "/images/Fotos/Puentes/Puente Sisga - BTS.jfif"
   },
   {
     categoria: "Puentes",
     titulo: "Puente Carmelo Torres Tovar",
-    ubicacion: "Banco, Magdalena – Tamalameque, Cesar"
+    ubicacion: "Banco, Magdalena – Tamalameque, Cesar",
+    imagen: "/images/Fotos/Puentes/PTE CARMELO TORRES.png"
   },
   {
     categoria: "Edificaciones",
     titulo: "Gran Plaza Soacha",
-    ubicacion: "Soacha"
+    ubicacion: "Soacha",
+    imagen: "/images/Fotos/Comercio/CC Gran plaza Soacha Consorcio Conconcreto y Carlos Collins.jpeg"
   },
   {
     categoria: "Edificaciones",
     titulo: "Altos de San Antonio",
-    ubicacion: "Bogotá"
+    ubicacion: "Bogotá",
+    imagen: "/images/Fotos/Vivienda/Mirador de Cervantes  Cra 9na Calle 84 - Construtecnia.jfif"
   },
   {
     categoria: "Edificaciones",
     titulo: "Balcones de San Carlos",
-    ubicacion: "Bogotá"
+    ubicacion: "Bogotá",
+    imagen: "/images/Fotos/Vivienda/Allure Cartagena - KMA.jfif"
   },
   {
     categoria: "Transporte",
     titulo: "Estación Intermedia Banderas",
-    ubicacion: "TransMilenio"
+    ubicacion: "TransMilenio",
+    imagen: "/images/Fotos/Institucionales/Estación grupo 9 Av 68 - Transmilenio.jpeg"
   },
   {
     categoria: "Transporte",
     titulo: "Estación Cabecera Américas",
-    ubicacion: "TransMilenio"
+    ubicacion: "TransMilenio",
+    imagen: "/images/Fotos/Institucionales/Estación Cabecera Américas - Transmilenio.png"
   },
   {
     categoria: "Transporte",
     titulo: "Estación TransMilenio Carrera 10",
-    ubicacion: "Bogotá"
+    ubicacion: "Bogotá",
+    imagen: "/images/Fotos/Institucionales/Estación cra 10 - Transmilenio.jpg"
   },
   {
     categoria: "Edificaciones",
     titulo: "Aeropuerto Gustavo Rojas Pinilla",
-    ubicacion: "San Andrés"
+    ubicacion: "San Andrés",
+    imagen: "/images/Fotos/IMG-20190703-WA0077.jpg"
   },
   {
     categoria: "Industrial",
     titulo: "Planta de Cemento San Marcos",
-    ubicacion: "Colombia"
+    ubicacion: "Colombia",
+    imagen: "/images/Fotos/Industrial/Bodegas Puerto Central - Prodesa.jfif"
   }
 ];
 
@@ -149,6 +162,12 @@ function Proyectos() {
                 >
 
                   <div className="project-image">
+
+                    <img
+                      src={proyecto.imagen}
+                      alt={proyecto.titulo}
+                      loading="lazy"
+                    />
 
                     <span>
                       {proyecto.categoria}

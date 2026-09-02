@@ -1,5 +1,56 @@
 import Navbar from "../components/Navbar";
 
+const fotosExperiencia = [
+  {
+    src: "/images/Fotos/IMG-20190703-WA0076.jpg",
+    alt: "Registro de obra de S&A",
+  },
+  {
+    src: "/images/Fotos/IMG-20190628-WA0014.jpg",
+    alt: "Visita técnica de S&A",
+  },
+  {
+    src: "/images/Fotos/IMG-20190628-WA0012.jpg",
+    alt: "Estructura en proceso de construcción",
+  },
+  {
+    src: "/images/Fotos/IMG-20190628-WA0010.jpg",
+    alt: "Inspección de estructura",
+  },
+  {
+    src: "/images/Fotos/IMG_20190627_113725721.jpg",
+    alt: "Proyecto de infraestructura",
+  },
+  {
+    src: "/images/Fotos/IMG_20190627_095936708_HDR.jpg",
+    alt: "Detalle de obra de ingeniería",
+  },
+  {
+    src: "/images/Fotos/IMG_20190627_095838609_HDR.jpg",
+    alt: "Trabajo de campo de S&A",
+  },
+  {
+    src: "/images/Fotos/IMG_20190626_125939610.jpg",
+    alt: "Estructura de proyecto civil",
+  },
+  {
+    src: "/images/Fotos/IMG_20190626_125744907.jpg",
+    alt: "Avance de proyecto de ingeniería",
+  },
+  {
+    src: "/images/Fotos/IMG_20190629_131124430.jpg",
+    alt: "Obra visitada por el equipo S&A",
+  },
+  {
+    src: "/images/Fotos/IMG_20190628_104625009.jpg",
+    alt: "Supervisión técnica en obra",
+  },
+  {
+    src: "/images/Fotos/IMG_20190627_113729372.jpg",
+    alt: "Solución estructural en obra",
+  },
+];
+
 function Experiencia() {
   return (
     <>
@@ -156,6 +207,18 @@ function Experiencia() {
                 </p>
               </div>
 
+            </div>
+
+            <div className="experience-gallery">
+              {fotosExperiencia.map((foto) => (
+                <figure key={foto.src}>
+                  <img
+                    src={foto.src}
+                    alt={foto.alt}
+                    loading="lazy"
+                  />
+                </figure>
+              ))}
             </div>
 
           </div>

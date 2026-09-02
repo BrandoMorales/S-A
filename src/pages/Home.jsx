@@ -174,13 +174,20 @@ function Home() {
             </h2>
 
             <div className="projects-placeholder">
-
-              <p>
-                Aquí construiremos el portafolio
-                de proyectos utilizando las fotografías
-                reales de S&A.
-              </p>
-
+              <div className="projects-photo-grid">
+                <img
+                  src="/images/Fotos/Puentes/Puente Sisga - BTS.jfif"
+                  alt="Puente El Embalse del Sisga"
+                />
+                <img
+                  src="/images/Fotos/Comercio/CC Gran plaza Soacha Consorcio Conconcreto y Carlos Collins.jpeg"
+                  alt="Gran Plaza Soacha"
+                />
+                <img
+                  src="/images/Fotos/Institucionales/Estación Cabecera Américas - Transmilenio.png"
+                  alt="Estación Cabecera Américas"
+                />
+              </div>
             </div>
 
             <a href="/proyectos" className="section-button">

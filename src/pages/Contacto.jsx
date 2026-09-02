@@ -221,7 +221,7 @@ function Contacto() {
                     <strong>Correo</strong>
 
                     <p>
-                      info@sya.com.co
+                      felipemoralesherrera888@gmail.com
                     </p>
                   </div>
                 </div>
