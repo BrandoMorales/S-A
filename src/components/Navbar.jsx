@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { LogIn, Menu, X } from "lucide-react";
 
 import "../styles/navbar.css";
 
@@ -30,7 +30,7 @@ function Navbar() {
       <div className="navbar-container">
 
         <a href="/" className="logo">
-        <img src="/public/Logo/logo.png" alt="S&A Santander y Asociados" height="90" width="180" />
+        <img src="/Logo/logo.png" alt="S&A Santander y Asociados" height="90" width="180" />
         </a>
 
         {/* MENÚ DESKTOP */}
@@ -63,6 +63,11 @@ function Navbar() {
           <Link to="/contacto" className="nav-contact">
             Contacto
           </Link>
+
+          <NavLink to="/login" className="nav-login">
+            <LogIn size={16} />
+            Login
+          </NavLink>
 
         </nav>
 
@@ -107,6 +112,11 @@ function Navbar() {
         <Link to="/contacto" onClick={closeMenu}>
           Contacto
         </Link>
+
+        <NavLink to="/login" onClick={closeMenu}>
+          <LogIn size={17} />
+          Login
+        </NavLink>
 
       </div>
 

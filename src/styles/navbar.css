@@ -10,6 +10,7 @@
 
 .navbar-scrolled {
   background: rgba(10, 18, 30, 0.96);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   padding: 14px 0;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
@@ -106,6 +107,25 @@
   color: #111;
 }
 
+.nav-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: white;
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition: 0.3s;
+}
+
+.nav-login:hover,
+.nav-login.active {
+  color: #c9a46c;
+}
+
 /* MOBILE */
 
 .mobile-menu-button {
@@ -166,6 +186,10 @@
   }
 
   .mobile-menu a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
     color: white;
     text-decoration: none;
 
