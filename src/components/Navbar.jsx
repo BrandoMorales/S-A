@@ -30,7 +30,7 @@ function Navbar() {
       <div className="navbar-container">
 
         <a href="/" className="logo">
-        <img src="/public/Logo/logo.png" alt="S&A Santander y Asociados" />
+        <img src="/public/Logo/logo.png" alt="S&A Santander y Asociados" height="90" width="180" />
         </a>
 
         {/* MENÚ DESKTOP */}
