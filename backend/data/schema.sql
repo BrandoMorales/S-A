@@ -24,3 +24,32 @@ CREATE TABLE IF NOT EXISTS mensajes (
   PRIMARY KEY (id),
   KEY mensajes_fecha_index (fecha)
 );
+
+CREATE TABLE IF NOT EXISTS contenido (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  tipo VARCHAR(30) NOT NULL,
+  titulo VARCHAR(220) NOT NULL DEFAULT '',
+  subtitulo VARCHAR(220) NOT NULL DEFAULT '',
+  categoria VARCHAR(120) NOT NULL DEFAULT '',
+  ubicacion VARCHAR(180) NOT NULL DEFAULT '',
+  resumen TEXT NOT NULL,
+  descripcion TEXT NOT NULL,
+  imagen LONGTEXT NOT NULL,
+  slug VARCHAR(220) NOT NULL DEFAULT '',
+  autor VARCHAR(120) NOT NULL DEFAULT '',
+  fecha_publicacion DATE NULL,
+  estado VARCHAR(30) NOT NULL DEFAULT 'Borrador',
+  orden INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY contenido_tipo_estado_index (tipo, estado),
+  UNIQUE KEY contenido_tipo_slug_unique (tipo, slug)
+);
+
+CREATE TABLE IF NOT EXISTS configuracion (
+  clave VARCHAR(80) NOT NULL,
+  valor LONGTEXT NOT NULL,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (clave)
+);

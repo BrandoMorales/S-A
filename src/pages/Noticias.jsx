@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import { getPublicContent, resolveImageUrl } from "../utils/contentApi";
 
 const noticias = [
   {
@@ -28,6 +30,16 @@ const noticias = [
 ];
 
 function Noticias() {
+  const [items, setItems] = useState(noticias);
+
+  useEffect(() => {
+    getPublicContent("noticias")
+      .then((data) => {
+        if (data.length) setItems(data);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -72,7 +84,7 @@ function Noticias() {
 
             <div className="news-grid">
 
-              {noticias.map((noticia, index) => (
+              {items.map((noticia, index) => (
 
                 <article
                   className="news-card"
@@ -81,11 +93,13 @@ function Noticias() {
 
                   <div className="news-image">
 
-                    <img
-                      src={noticia.imagen}
-                      alt={noticia.titulo}
-                      loading="lazy"
-                    />
+                    {noticia.imagen ? (
+                      <img
+                        src={resolveImageUrl(noticia.imagen)}
+                        alt={noticia.titulo}
+                        loading="lazy"
+                      />
+                    ) : <div className="image-placeholder">Sin imagen</div>}
 
                     <span>
                       {noticia.fecha}
@@ -103,9 +117,7 @@ function Noticias() {
                       {noticia.titulo}
                     </h3>
 
-                    <p>
-                      {noticia.texto}
-                    </p>
+                    <p>{noticia.resumen || noticia.texto || noticia.descripcion}</p>
 
                     <a href="/contacto">
                       Conocer más →

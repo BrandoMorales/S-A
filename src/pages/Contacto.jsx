@@ -72,10 +72,10 @@ function Contacto() {
         }
       );
 
+      const backendData = await responseBackend.json().catch(() => ({}));
+
       if (!responseBackend.ok) {
-        throw new Error(
-          "No se pudo guardar el mensaje"
-        );
+        throw new Error(backendData.message || "No se pudo guardar el mensaje");
       }
 
       /*
@@ -90,27 +90,47 @@ function Contacto() {
         (value) => value && !value.startsWith("TU_")
       );
 
+      let emailSent = false;
+      let emailErrorMessage = "";
+
       if (emailjsConfigured) {
-        await emailjs.send(
-          EMAILJS_SERVICE_ID,
-          EMAILJS_TEMPLATE_ID,
-          {
+        try {
+          const templateParams = {
+            name: formData.nombre,
+            from_name: formData.nombre,
             nombre: formData.nombre,
             email: formData.email,
+            user_email: formData.email,
+            reply_to: formData.email,
             telefono: formData.telefono,
             asunto: formData.asunto,
+            title: formData.asunto || "Nueva solicitud de contacto",
+            time: new Date().toLocaleString("es-CO"),
+            message: formData.mensaje,
             mensaje: formData.mensaje,
-          },
-          {
-            publicKey: EMAILJS_PUBLIC_KEY,
-          }
-        );
+          };
+
+          await emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID,
+            templateParams,
+            { publicKey: EMAILJS_PUBLIC_KEY }
+          );
+          emailSent = true;
+        } catch (emailError) {
+          console.error("EmailJS no pudo enviar el correo:", emailError);
+          emailErrorMessage = emailError?.text || emailError?.message || "Revisa el Service ID, Template ID y Public Key.";
+        }
       }
 
       Swal.fire({
         icon: "success",
-        title: "Mensaje enviado",
-        text: "Gracias por contactarnos. Hemos recibido su mensaje correctamente.",
+        title: emailSent ? "Mensaje enviado" : "Solicitud recibida",
+        text: emailSent
+          ? "Gracias por contactarnos. Hemos recibido su mensaje correctamente."
+          : emailjsConfigured
+            ? `Tu mensaje quedó guardado correctamente, pero EmailJS respondió: ${emailErrorMessage}`
+            : "Tu mensaje quedó guardado correctamente. El correo automático aún no está configurado.",
         confirmButtonText: "Aceptar",
       });
 
@@ -230,12 +250,19 @@ function Contacto() {
 
               <div className="contact-form-container">
 
+                <div className="contact-form-heading">
+                  <span className="contact-form-kicker">CUÉNTENOS SU IDEA</span>
+                  <h2>Iniciemos una conversación</h2>
+                  <p>Complete el formulario y nuestro equipo se pondrá en contacto con usted.</p>
+                </div>
+
                 <form
                   className="contact-form"
                   onSubmit={handleSubmit}
                 >
 
-                  <div className="form-group">
+                  <div className="form-row">
+                    <div className="form-group">
                     <label htmlFor="nombre">
                       Nombre *
                     </label>
@@ -249,9 +276,9 @@ function Contacto() {
                       placeholder="Su nombre"
                       required
                     />
-                  </div>
+                    </div>
 
-                  <div className="form-group">
+                    <div className="form-group">
                     <label htmlFor="email">
                       Correo electrónico *
                     </label>
@@ -265,9 +292,11 @@ function Contacto() {
                       placeholder="correo@ejemplo.com"
                       required
                     />
+                    </div>
                   </div>
 
-                  <div className="form-group">
+                  <div className="form-row">
+                    <div className="form-group">
                     <label htmlFor="telefono">
                       Teléfono
                     </label>
@@ -280,9 +309,9 @@ function Contacto() {
                       onChange={handleChange}
                       placeholder="Su número de teléfono"
                     />
-                  </div>
+                    </div>
 
-                  <div className="form-group">
+                    <div className="form-group">
                     <label htmlFor="asunto">
                       Asunto
                     </label>
@@ -295,6 +324,7 @@ function Contacto() {
                       onChange={handleChange}
                       placeholder="Asunto"
                     />
+                    </div>
                   </div>
 
                   <div className="form-group">
@@ -327,6 +357,10 @@ function Contacto() {
                       </>
                     )}
                   </button>
+
+                  <p className="form-note">
+                    Sus datos se utilizarán únicamente para responder a su solicitud.
+                  </p>
 
                 </form>
 

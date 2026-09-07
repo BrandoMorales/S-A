@@ -1,6 +1,43 @@
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import { getPublicContent, resolveImageUrl } from "../utils/contentApi";
+
+const HERO_FALLBACK_IMAGE = "/images/Fotos/Puentes/Puente Sisga - BTS.jfif";
 
 function Home() {
+  const fallbackSlide = {
+    subtitulo: "SANTANDER Y ASOCIADOS",
+    titulo: "Ingeniería que construye confianza.",
+    descripcion: "Soluciones de ingeniería, diseño estructural, consultoría e interventoría para proyectos de infraestructura y edificación.",
+    imagen: HERO_FALLBACK_IMAGE,
+  };
+  const [slides, setSlides] = useState([fallbackSlide]);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    getPublicContent("slider")
+      .then((data) => {
+        if (data.length) {
+          setSlides(data.map((currentSlide) => ({
+            ...currentSlide,
+            imagen: currentSlide.imagen === "/assets/hero.png" ? HERO_FALLBACK_IMAGE : resolveImageUrl(currentSlide.imagen),
+          })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (slides.length < 2) return undefined;
+    const timer = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % slides.length);
+    }, 6500);
+    return () => window.clearInterval(timer);
+  }, [slides.length]);
+
+  const slide = slides[activeSlide] || fallbackSlide;
+  const slideImage = resolveImageUrl(slide.imagen) || HERO_FALLBACK_IMAGE;
+
   return (
     <>
       <Navbar />
@@ -9,26 +46,17 @@ function Home() {
       <main>
 
         {/* HERO */}
-        <section className="hero">
+        <section className="hero" style={{ backgroundImage: `linear-gradient(rgba(5, 15, 28, .24), rgba(5, 15, 28, .24)), url(${slideImage})` }}>
 
           <div className="hero-overlay"></div>
 
           <div className="hero-content">
 
-            <p className="hero-subtitle">
-              SANTANDER Y ASOCIADOS
-            </p>
+            <p className="hero-subtitle">{slide.subtitulo || "SANTANDER Y ASOCIADOS"}</p>
 
-            <h1>
-              Ingeniería que construye
-              <span> confianza.</span>
-            </h1>
+            <h1>{slide.titulo}</h1>
 
-            <p className="hero-description">
-              Soluciones de ingeniería, diseño estructural,
-              consultoría e interventoría para proyectos
-              de infraestructura y edificación.
-            </p>
+            <p className="hero-description">{slide.descripcion}</p>
 
             <div className="hero-buttons">
 

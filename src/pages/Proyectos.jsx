@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import { getPublicContent, resolveImageUrl } from "../utils/contentApi";
 
 const proyectos = [
   {
@@ -82,6 +84,22 @@ const proyectos = [
 ];
 
 function Proyectos() {
+  const [items, setItems] = useState(proyectos);
+  const [activeCategory, setActiveCategory] = useState("Todos");
+
+  useEffect(() => {
+    getPublicContent("proyectos")
+      .then((data) => {
+        if (data.length) setItems(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const categories = ["Todos", "Infraestructura", "Puentes", "Edificaciones", "Transporte", "Industrial"];
+  const filteredItems = activeCategory === "Todos"
+    ? items
+    : items.filter((proyecto) => proyecto.categoria === activeCategory);
+
   return (
     <>
       <Navbar />
@@ -125,36 +143,23 @@ function Proyectos() {
 
             <div className="project-filter">
 
-              <button className="active">
-                Todos
-              </button>
-
-              <button>
-                Infraestructura
-              </button>
-
-              <button>
-                Puentes
-              </button>
-
-              <button>
-                Edificaciones
-              </button>
-
-              <button>
-                Transporte
-              </button>
-
-              <button>
-                Industrial
-              </button>
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  className={activeCategory === category ? "active" : ""}
+                  onClick={() => setActiveCategory(category)}
+                  type="button"
+                >
+                  {category}
+                </button>
+              ))}
 
             </div>
 
 
             <div className="projects-grid">
 
-              {proyectos.map((proyecto, index) => (
+              {filteredItems.map((proyecto, index) => (
 
                 <article
                   className="project-card"
@@ -163,11 +168,13 @@ function Proyectos() {
 
                   <div className="project-image">
 
-                    <img
-                      src={proyecto.imagen}
-                      alt={proyecto.titulo}
-                      loading="lazy"
-                    />
+                    {proyecto.imagen ? (
+                      <img
+                        src={resolveImageUrl(proyecto.imagen)}
+                        alt={proyecto.titulo}
+                        loading="lazy"
+                      />
+                    ) : <div className="image-placeholder">Sin imagen</div>}
 
                     <span>
                       {proyecto.categoria}
@@ -194,6 +201,12 @@ function Proyectos() {
                 </article>
 
               ))}
+
+              {filteredItems.length === 0 && (
+                <p className="projects-empty">
+                  No hay proyectos publicados en esta categoría.
+                </p>
+              )}
 
             </div>
 

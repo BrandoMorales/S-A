@@ -1,4 +1,6 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
@@ -32,7 +34,7 @@ const dbConfig = {
 const pool = mysql.createPool(dbConfig);
 
 app.use(cors({ origin: process.env.FRONTEND_URL || "*" }));
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "8mb" }));
 
 async function inicializarBaseDeDatos() {
   const adminPool = mysql.createPool({
@@ -75,6 +77,95 @@ async function inicializarBaseDeDatos() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   `);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS contenido (
+      id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+      tipo VARCHAR(30) NOT NULL,
+      titulo VARCHAR(220) NOT NULL DEFAULT '',
+      subtitulo VARCHAR(220) NOT NULL DEFAULT '',
+      categoria VARCHAR(120) NOT NULL DEFAULT '',
+      ubicacion VARCHAR(180) NOT NULL DEFAULT '',
+      resumen TEXT NOT NULL,
+      descripcion TEXT NOT NULL,
+      imagen LONGTEXT NOT NULL,
+      slug VARCHAR(220) NOT NULL DEFAULT '',
+      autor VARCHAR(120) NOT NULL DEFAULT '',
+      fecha_publicacion DATE NULL,
+      estado VARCHAR(30) NOT NULL DEFAULT 'Borrador',
+      orden INT NOT NULL DEFAULT 0,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      KEY contenido_tipo_estado_index (tipo, estado),
+      UNIQUE KEY contenido_tipo_slug_unique (tipo, slug)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await pool.query("ALTER TABLE contenido MODIFY COLUMN imagen LONGTEXT NOT NULL");
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS configuracion (
+      clave VARCHAR(80) NOT NULL,
+      valor LONGTEXT NOT NULL,
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      PRIMARY KEY (clave)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
+  const configuracionPorDefecto = {
+    sitio: {
+      empresa: "S&A Santander y Asociados",
+      emailNotificaciones: "felipemoralesherrera888@gmail.com",
+      notificacionesActivas: true,
+    },
+    analytics: {
+      measurementId: "",
+      enabled: false,
+      anonymize: true,
+    },
+    seo: {
+      title: "S&A Santander y Asociados | Ingeniería y consultoría",
+      description: "Soluciones de ingeniería, diseño estructural, consultoría e interventoría para proyectos de infraestructura y edificación.",
+      canonical: "https://sya.com.co/",
+      image: "/Logo/logo.png",
+      indexable: true,
+    },
+  };
+
+  for (const [clave, valor] of Object.entries(configuracionPorDefecto)) {
+    await pool.query(
+      "INSERT IGNORE INTO configuracion (clave, valor) VALUES (?, ?)",
+      [clave, JSON.stringify(valor)]
+    );
+  }
+
+  const seedPath = path.join(__dirname, "data", "content-seed.json");
+  const contenidoInicial = JSON.parse(fs.readFileSync(seedPath, "utf8"));
+
+  for (const item of contenidoInicial) {
+    await pool.query(
+      `INSERT IGNORE INTO contenido
+       (tipo, titulo, subtitulo, categoria, ubicacion, resumen, descripcion,
+        imagen, slug, autor, fecha_publicacion, estado, orden)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        item.tipo,
+        item.titulo || "",
+        item.subtitulo || "",
+        item.categoria || "",
+        item.ubicacion || "",
+        item.resumen || item.descripcion || "",
+        item.descripcion || item.resumen || "",
+        item.imagen || "",
+        item.slug,
+        item.autor || "Equipo S&A",
+        item.fecha || null,
+        item.estado || "Publicado",
+        Number(item.orden || 0),
+      ]
+    );
+  }
+
   const [users] = await pool.query(
     "SELECT id FROM admin_users WHERE username = ? LIMIT 1",
     [ADMIN_USER]
@@ -105,6 +196,47 @@ function verificarToken(req, res, next) {
   }
 }
 
+const TIPOS_CONTENIDO = new Set([
+  "proyectos",
+  "servicios",
+  "noticias",
+  "clientes",
+  "experiencia",
+  "slider",
+]);
+
+function validarTipoContenido(req, res, next) {
+  if (!TIPOS_CONTENIDO.has(req.params.tipo)) {
+    return res.status(400).json({ message: "Tipo de contenido no válido" });
+  }
+  next();
+}
+
+function normalizarContenido(body = {}) {
+  const titulo = String(body.titulo || body.nombre || "").trim();
+  const slugBase = String(body.slug || titulo)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return {
+    titulo,
+    subtitulo: String(body.subtitulo || "").trim(),
+    categoria: String(body.categoria || "").trim(),
+    ubicacion: String(body.ubicacion || "").trim(),
+    resumen: String(body.resumen || body.categoria || "").trim(),
+    descripcion: String(body.descripcion || "").trim(),
+    imagen: String(body.imagen || "").trim(),
+    slug: slugBase || `contenido-${Date.now()}`,
+    autor: String(body.autor || "").trim(),
+    fecha_publicacion: body.fecha || body.fecha_publicacion || null,
+    estado: String(body.estado || "Borrador").trim(),
+    orden: Number(body.orden || 0),
+  };
+}
+
 app.get("/", (req, res) => {
   res.json({
     message: "API S&A Santander y Asociados funcionando correctamente",
@@ -117,6 +249,124 @@ app.get("/api/health", async (req, res) => {
     res.json({ status: "ok", database: "connected" });
   } catch (error) {
     res.status(503).json({ status: "error", database: "unavailable" });
+  }
+});
+
+app.get("/api/contenido/:tipo", validarTipoContenido, async (req, res) => {
+  try {
+    const [items] = await pool.query(
+      `SELECT id, tipo, titulo, subtitulo, categoria, ubicacion, resumen,
+              descripcion, imagen, slug, autor, fecha_publicacion AS fecha,
+              estado, orden, created_at, updated_at
+       FROM contenido
+       WHERE tipo = ? AND estado = 'Publicado'
+       ORDER BY orden ASC, created_at DESC`,
+      [req.params.tipo]
+    );
+    res.json(items);
+  } catch (error) {
+    console.error("Error cargando contenido público:", error.message);
+    res.status(500).json({ message: "No se pudo cargar el contenido" });
+  }
+});
+
+const PERMISOS_POR_ROL = {
+  admin: ["contenido:leer", "contenido:crear", "contenido:editar", "contenido:publicar", "contenido:eliminar", "mensajes:leer", "mensajes:gestionar", "usuarios:gestionar"],
+  Administrador: ["contenido:leer", "contenido:crear", "contenido:editar", "contenido:publicar", "contenido:eliminar", "mensajes:leer", "mensajes:gestionar", "usuarios:gestionar"],
+  Editor: ["contenido:leer", "contenido:crear", "contenido:editar", "contenido:publicar", "contenido:eliminar", "mensajes:leer", "mensajes:gestionar"],
+  Autor: ["contenido:leer", "contenido:crear", "contenido:editar", "mensajes:leer"],
+  Colaborador: ["contenido:leer", "contenido:crear", "mensajes:leer"],
+  Suscriptor: ["contenido:leer"],
+};
+
+function tienePermiso(req, permiso) {
+  return (PERMISOS_POR_ROL[req.admin?.role] || []).includes(permiso);
+}
+
+function exigirPermiso(permiso) {
+  return (req, res, next) => {
+    if (!tienePermiso(req, permiso)) {
+      return res.status(403).json({ message: "Tu rol no tiene permiso para esta acción" });
+    }
+    next();
+  };
+}
+
+app.get("/api/admin/contenido/:tipo", verificarToken, exigirPermiso("contenido:leer"), validarTipoContenido, async (req, res) => {
+  try {
+    const [items] = await pool.query(
+      `SELECT id, tipo, titulo, subtitulo, categoria, ubicacion, resumen,
+              descripcion, imagen, slug, autor, fecha_publicacion AS fecha,
+              estado, orden, created_at, updated_at
+       FROM contenido WHERE tipo = ? ORDER BY orden ASC, created_at DESC`,
+      [req.params.tipo]
+    );
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ message: "No se pudo cargar el contenido" });
+  }
+});
+
+app.post("/api/admin/contenido/:tipo", verificarToken, exigirPermiso("contenido:crear"), validarTipoContenido, async (req, res) => {
+  const contenido = normalizarContenido(req.body);
+  if (!tienePermiso(req, "contenido:publicar")) contenido.estado = "Borrador";
+  if (!contenido.titulo || !contenido.descripcion) {
+    return res.status(400).json({ message: "Título y descripción son obligatorios" });
+  }
+
+  try {
+    const [result] = await pool.query(
+      `INSERT INTO contenido
+       (tipo, titulo, subtitulo, categoria, ubicacion, resumen, descripcion,
+        imagen, slug, autor, fecha_publicacion, estado, orden)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [req.params.tipo, ...Object.values(contenido)]
+    );
+    const [rows] = await pool.query("SELECT * FROM contenido WHERE id = ?", [result.insertId]);
+    res.status(201).json(rows[0]);
+  } catch (error) {
+    console.error("Error creando contenido:", error.message);
+    res.status(500).json({ message: "No se pudo crear el contenido" });
+  }
+});
+
+app.patch("/api/admin/contenido/:tipo/:id", verificarToken, exigirPermiso("contenido:editar"), validarTipoContenido, async (req, res) => {
+  const contentId = Number(req.params.id);
+  if (!Number.isSafeInteger(contentId) || contentId <= 0) {
+    return res.status(400).json({ message: "El ID del contenido no es válido" });
+  }
+  const contenido = normalizarContenido(req.body);
+  if (!tienePermiso(req, "contenido:publicar")) contenido.estado = "Borrador";
+  try {
+    const [result] = await pool.query(
+      `UPDATE contenido SET titulo = ?, subtitulo = ?, categoria = ?, ubicacion = ?,
+       resumen = ?, descripcion = ?, imagen = ?, slug = ?, autor = ?,
+       fecha_publicacion = ?, estado = ?, orden = ? WHERE tipo = ? AND id = ?`,
+      [...Object.values(contenido), req.params.tipo, contentId]
+    );
+    if (!result.affectedRows) return res.status(404).json({ message: "Contenido no encontrado" });
+    const [rows] = await pool.query("SELECT * FROM contenido WHERE id = ?", [contentId]);
+    res.json(rows[0]);
+  } catch (error) {
+    console.error("Error actualizando contenido:", error.message);
+    res.status(500).json({ message: "No se pudo actualizar el contenido" });
+  }
+});
+
+app.delete("/api/admin/contenido/:tipo/:id", verificarToken, exigirPermiso("contenido:eliminar"), validarTipoContenido, async (req, res) => {
+  const contentId = Number(req.params.id);
+  if (!Number.isSafeInteger(contentId) || contentId <= 0) {
+    return res.status(400).json({ message: "El ID del contenido no es válido" });
+  }
+  try {
+    const [result] = await pool.query(
+      "DELETE FROM contenido WHERE tipo = ? AND id = ?",
+      [req.params.tipo, contentId]
+    );
+    if (!result.affectedRows) return res.status(404).json({ message: "Contenido no encontrado" });
+    res.json({ message: "Contenido eliminado correctamente" });
+  } catch (error) {
+    res.status(500).json({ message: "No se pudo eliminar el contenido" });
   }
 });
 
@@ -147,11 +397,167 @@ app.post("/api/login", async (req, res) => {
     res.json({
       message: "Inicio de sesión correcto",
       token,
-      user: { username: user.username, role: user.role },
+      user: { id: user.id, username: user.username, role: user.role },
     });
   } catch (error) {
     console.error("Error en login:", error.message);
     res.status(500).json({ message: "No se pudo procesar el inicio de sesión" });
+  }
+});
+
+const ROLES_ADMIN = new Set([
+  "Administrador",
+  "Editor",
+  "Autor",
+  "Colaborador",
+  "Suscriptor",
+]);
+
+function exigirAdministrador(req, res, next) {
+  if (req.admin?.role !== "admin" && req.admin?.role !== "Administrador") {
+    return res.status(403).json({ message: "Solo un administrador puede gestionar usuarios" });
+  }
+  next();
+}
+
+app.get("/api/admin/usuarios", verificarToken, exigirAdministrador, async (req, res) => {
+  try {
+    const [users] = await pool.query(
+      "SELECT id, username, role, created_at FROM admin_users ORDER BY created_at DESC"
+    );
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "No se pudieron cargar los usuarios" });
+  }
+});
+
+app.post("/api/admin/usuarios", verificarToken, exigirAdministrador, async (req, res) => {
+  const username = String(req.body.username || "").trim();
+  const password = String(req.body.password || "");
+  const role = String(req.body.role || "Suscriptor").trim();
+
+  if (username.length < 3 || password.length < 6 || !ROLES_ADMIN.has(role)) {
+    return res.status(400).json({ message: "Usuario, contraseña y rol no son válidos" });
+  }
+
+  try {
+    const passwordHash = await bcrypt.hash(password, 12);
+    const [result] = await pool.query(
+      "INSERT INTO admin_users (username, password_hash, role) VALUES (?, ?, ?)",
+      [username, passwordHash, role]
+    );
+    res.status(201).json({ id: result.insertId, username, role });
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({ message: "Ese usuario ya existe" });
+    }
+    res.status(500).json({ message: "No se pudo crear el usuario" });
+  }
+});
+
+app.patch("/api/admin/usuarios/:id", verificarToken, exigirAdministrador, async (req, res) => {
+  const role = String(req.body.role || "").trim();
+  const userId = Number(req.params.id);
+  if (!Number.isSafeInteger(userId) || !ROLES_ADMIN.has(role)) {
+    return res.status(400).json({ message: "Usuario o rol no válido" });
+  }
+
+  try {
+    const [result] = await pool.query(
+      "UPDATE admin_users SET role = ? WHERE id = ?",
+      [role, userId]
+    );
+    if (!result.affectedRows) return res.status(404).json({ message: "Usuario no encontrado" });
+    res.json({ message: "Rol actualizado correctamente" });
+  } catch (error) {
+    res.status(500).json({ message: "No se pudo actualizar el rol" });
+  }
+});
+
+app.delete("/api/admin/usuarios/:id", verificarToken, exigirAdministrador, async (req, res) => {
+  const userId = Number(req.params.id);
+  if (!Number.isSafeInteger(userId) || userId === Number(req.admin.sub)) {
+    return res.status(400).json({ message: "No puedes eliminar tu propio usuario" });
+  }
+
+  try {
+    const [result] = await pool.query("DELETE FROM admin_users WHERE id = ?", [userId]);
+    if (!result.affectedRows) return res.status(404).json({ message: "Usuario no encontrado" });
+    res.json({ message: "Usuario eliminado correctamente" });
+  } catch (error) {
+    res.status(500).json({ message: "No se pudo eliminar el usuario" });
+  }
+});
+
+app.get("/api/configuracion", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT clave, valor FROM configuracion");
+    const config = {};
+    for (const row of rows) {
+      try {
+        config[row.clave] = JSON.parse(row.valor);
+      } catch {
+        config[row.clave] = row.valor;
+      }
+    }
+    res.json(config);
+  } catch (error) {
+    console.error("Error obteniendo configuración pública:", error.message);
+    res.status(500).json({ message: "No se pudo cargar la configuración" });
+  }
+});
+
+app.get("/api/admin/configuracion", verificarToken, exigirAdministrador, async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT clave, valor FROM configuracion");
+    const config = {};
+    for (const row of rows) {
+      try {
+        config[row.clave] = JSON.parse(row.valor);
+      } catch {
+        config[row.clave] = row.valor;
+      }
+    }
+    res.json(config);
+  } catch (error) {
+    console.error("Error obteniendo configuración admin:", error.message);
+    res.status(500).json({ message: "No se pudo cargar la configuración" });
+  }
+});
+
+app.put("/api/admin/configuracion", verificarToken, exigirAdministrador, async (req, res) => {
+  const { sitio, analytics, seo } = req.body || {};
+  const clavesValidas = { sitio, analytics, seo };
+
+  try {
+    for (const [clave, valor] of Object.entries(clavesValidas)) {
+      if (valor !== undefined) {
+        await pool.query(
+          `INSERT INTO configuracion (clave, valor)
+           VALUES (?, ?)
+           ON DUPLICATE KEY UPDATE valor = VALUES(valor)`,
+          [clave, JSON.stringify(valor)]
+        );
+      }
+    }
+
+    const [rows] = await pool.query("SELECT clave, valor FROM configuracion");
+    const config = {};
+    for (const row of rows) {
+      try {
+        config[row.clave] = JSON.parse(row.valor);
+      } catch {
+        config[row.clave] = row.valor;
+      }
+    }
+
+    res.json({
+      message: "Configuración guardada correctamente en el servidor",
+      configuracion: config,
+    });
+  } catch (error) {
+    console.error("Error guardando configuración admin:", error.message);
+    res.status(500).json({ message: "No se pudo guardar la configuración en la base de datos" });
   }
 });
 
@@ -198,7 +604,7 @@ app.post("/api/mensajes", async (req, res) => {
   }
 });
 
-app.get("/api/mensajes", verificarToken, async (req, res) => {
+app.get("/api/mensajes", verificarToken, exigirPermiso("mensajes:leer"), async (req, res) => {
   try {
     const [mensajes] = await pool.query(
       "SELECT id, nombre, email, telefono, asunto, mensaje, fecha, leido FROM mensajes ORDER BY fecha DESC"
@@ -209,7 +615,7 @@ app.get("/api/mensajes", verificarToken, async (req, res) => {
   }
 });
 
-app.patch("/api/mensajes/:id", verificarToken, async (req, res) => {
+app.patch("/api/mensajes/:id", verificarToken, exigirPermiso("mensajes:gestionar"), async (req, res) => {
   try {
     const [result] = await pool.query(
       "UPDATE mensajes SET leido = TRUE WHERE id = ?",
@@ -226,7 +632,7 @@ app.patch("/api/mensajes/:id", verificarToken, async (req, res) => {
   }
 });
 
-app.delete("/api/mensajes/:id", verificarToken, async (req, res) => {
+app.delete("/api/mensajes/:id", verificarToken, exigirPermiso("mensajes:gestionar"), async (req, res) => {
   try {
     const [result] = await pool.query(
       "DELETE FROM mensajes WHERE id = ?",

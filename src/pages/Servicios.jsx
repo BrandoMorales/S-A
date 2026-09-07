@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import { getPublicContent, resolveImageUrl } from "../utils/contentApi";
 
 const servicios = [
   {
@@ -70,6 +72,16 @@ const servicios = [
 ];
 
 function Servicios() {
+  const [items, setItems] = useState(servicios);
+
+  useEffect(() => {
+    getPublicContent("servicios")
+      .then((data) => {
+        if (data.length) setItems(data);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -145,15 +157,25 @@ function Servicios() {
 
             <div className="all-services-grid">
 
-              {servicios.map((servicio) => (
+              {items.map((servicio, index) => (
 
                 <article
                   className="large-service-card"
                   key={servicio.numero}
                 >
 
-                  <span className="service-number">
-                    {servicio.numero}
+                  {servicio.imagen && (
+                    <div className="service-image">
+                      <img
+                        src={resolveImageUrl(servicio.imagen)}
+                        alt={servicio.titulo}
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+
+                    <span className="service-number">
+                      {servicio.numero || String(index + 1).padStart(2, "0")}
                   </span>
 
                   <h3>

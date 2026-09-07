@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import { getPublicContent, resolveImageUrl } from "../utils/contentApi";
 
 const fotosExperiencia = [
   {
@@ -52,6 +54,21 @@ const fotosExperiencia = [
 ];
 
 function Experiencia() {
+  const [gallery, setGallery] = useState(fotosExperiencia);
+
+  useEffect(() => {
+    getPublicContent("experiencia")
+      .then((data) => {
+        if (data.length) {
+          setGallery(data.map((item) => ({
+            src: resolveImageUrl(item.imagen),
+            alt: item.titulo || item.descripcion || "Experiencia de S&A",
+          })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -210,7 +227,7 @@ function Experiencia() {
             </div>
 
             <div className="experience-gallery">
-              {fotosExperiencia.map((foto) => (
+              {gallery.map((foto) => (
                 <figure key={foto.src}>
                   <img
                     src={foto.src}
