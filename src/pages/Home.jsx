@@ -1,42 +1,43 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { getPublicContent, resolveImageUrl } from "../utils/contentApi";
 
-const HERO_FALLBACK_IMAGE = "/images/Fotos/Puentes/Puente Sisga - BTS.jfif";
+const HOME_SLIDES = [
+  // IMAGEN 1: cambia únicamente la ruta de imagen aquí.
+  {
+    subtitulo: "SANTANDER Y ASOCIADOS SAS",
+    titulo: "Ingeniería estructural que construye confianza.",
+    descripcion: "Soluciones de ingeniería, diseño estructural, consultoría e interventoría para proyectos de infraestructura y edificación.",
+    imagen: "/images/INFO BASE WEB/EDIFICIOS/8-1. ALLURE.png",
+  },
+  // IMAGEN 2: cambia únicamente la ruta de imagen aquí.
+  {
+    subtitulo: "INFRAESTRUCTURA Y PUENTES",
+    titulo: "Estructuras para grandes proyectos.",
+    descripcion: "Diseño y consultoría estructural para obras de infraestructura seguras, eficientes y duraderas.",
+    imagen: "/images/INFO BASE WEB/puentes/PUENTES/10. PTE GUAYURIBA - META.png",
+  },
+  // IMAGEN 3: cambia únicamente la ruta de imagen aquí.
+  {
+    subtitulo: "EDIFICACIÓN",
+    titulo: "Diseño que hace posible avanzar.",
+    descripcion: "Experiencia técnica para proyectos residenciales, comerciales e industriales.",
+    imagen: "/images/Fotos/Vivienda/Allure Cartagena - KMA.jfif",
+  },
+];
 
 function Home() {
-  const fallbackSlide = {
-    subtitulo: "SANTANDER Y ASOCIADOS",
-    titulo: "Ingeniería que construye confianza.",
-    descripcion: "Soluciones de ingeniería, diseño estructural, consultoría e interventoría para proyectos de infraestructura y edificación.",
-    imagen: HERO_FALLBACK_IMAGE,
-  };
-  const [slides, setSlides] = useState([fallbackSlide]);
+  const [slides] = useState(HOME_SLIDES);
   const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
-    getPublicContent("slider")
-      .then((data) => {
-        if (data.length) {
-          setSlides(data.map((currentSlide) => ({
-            ...currentSlide,
-            imagen: currentSlide.imagen === "/assets/hero.png" ? HERO_FALLBACK_IMAGE : resolveImageUrl(currentSlide.imagen),
-          })));
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    if (slides.length < 2) return undefined;
     const timer = window.setInterval(() => {
       setActiveSlide((current) => (current + 1) % slides.length);
     }, 6500);
     return () => window.clearInterval(timer);
   }, [slides.length]);
 
-  const slide = slides[activeSlide] || fallbackSlide;
-  const slideImage = resolveImageUrl(slide.imagen) || HERO_FALLBACK_IMAGE;
+  const slide = slides[activeSlide] || slides[0];
+  const slideImage = encodeURI(slide.imagen);
 
   return (
     <>
@@ -46,7 +47,7 @@ function Home() {
       <main>
 
         {/* HERO */}
-        <section className="hero" style={{ backgroundImage: `linear-gradient(rgba(5, 15, 28, .24), rgba(5, 15, 28, .24)), url(${slideImage})` }}>
+        <section className="hero" style={{ backgroundImage: slideImage ? `linear-gradient(rgba(5, 15, 28, .24), rgba(5, 15, 28, .24)), url(${slideImage})` : "linear-gradient(135deg, #152b40, #304d63)" }}>
 
           <div className="hero-overlay"></div>
 
@@ -67,10 +68,27 @@ function Home() {
               <a href="#servicios" className="btn-secondary">
                 Nuestros servicios
               </a>
-
             </div>
 
           </div>
+
+          {slides.length > 1 && (
+            <div className="hero-carousel-controls" aria-label="Controles del slider">
+              <button type="button" onClick={() => setActiveSlide((current) => (current - 1 + slides.length) % slides.length)} aria-label="Diapositiva anterior">&#8592;</button>
+              <div className="hero-carousel-dots">
+                {slides.map((currentSlide, index) => (
+                  <button
+                    type="button"
+                    className={index === activeSlide ? "is-active" : ""}
+                    key={currentSlide.id || index}
+                    onClick={() => setActiveSlide(index)}
+                    aria-label={`Ir a la diapositiva ${index + 1}`}
+                  />
+                ))}
+              </div>
+              <button type="button" onClick={() => setActiveSlide((current) => (current + 1) % slides.length)} aria-label="Siguiente diapositiva">&#8594;</button>
+            </div>
+          )}
 
           <div className="hero-scroll">
             <span></span>
@@ -88,7 +106,7 @@ function Home() {
             <div className="section-heading">
 
               <span className="section-label">
-                S&A SANTANDER Y ASOCIADOS
+                S&A SANTANDER Y ASOCIADOS SAS
               </span>
 
               <h2>
@@ -138,8 +156,7 @@ function Home() {
             <div className="services-grid">
 
               <div className="service-card">
-                <span>01</span>
-                <h3>Diseño estructural</h3>
+                <h3>DISEÑO ESTRUCTURAL</h3>
                 <p>
                   Soluciones estructurales para diferentes
                   tipos de proyectos.
@@ -147,8 +164,7 @@ function Home() {
               </div>
 
               <div className="service-card">
-                <span>02</span>
-                <h3>Interventoría</h3>
+                <h3>INTERVENTORÍA</h3>
                 <p>
                   Acompañamiento y control técnico
                   durante la ejecución de proyectos.
@@ -156,8 +172,7 @@ function Home() {
               </div>
 
               <div className="service-card">
-                <span>03</span>
-                <h3>Infraestructura</h3>
+                <h3>INFRAESTRUCTURA</h3>
                 <p>
                   Diseño y consultoría para proyectos
                   de infraestructura.
@@ -165,8 +180,7 @@ function Home() {
               </div>
 
               <div className="service-card">
-                <span>04</span>
-                <h3>Edificaciones</h3>
+                <h3>EDIFICACIONES</h3>
                 <p>
                   Diseño estructural para proyectos
                   residenciales, comerciales e industriales.
@@ -250,7 +264,6 @@ function Home() {
         </section>
 
       </main>
-
     </>
   );
 }

@@ -216,7 +216,7 @@ El botón “Quitar imagen” guarda el campo vacío. La página pública muestr
 
 ### Slider principal
 
-El módulo **Slider principal** administra las diapositivas del Hero de Home. Sus cambios publicados se leen desde `/api/contenido/slider` y se reflejan en la portada automáticamente.
+El módulo **Slider principal** administra las diapositivas del Hero de Home. Sus cambios publicados se leen desde `/api/contenido/slider` y se reflejan en la portada automáticamente. Desde el interruptor **Activar carrusel automático** puedes decidir si las diapositivas cambian cada 6,5 segundos; aunque se desactive, permanecen disponibles los botones y puntos de navegación manual.
 
 ## Configuración del sitio, SEO y Analítica
 

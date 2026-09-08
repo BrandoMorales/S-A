@@ -20,7 +20,7 @@ a {
 }
 
 .hero {
-  min-height: 100vh;
+  min-height: max(680px, 100vh);
   background:
     linear-gradient(
       rgba(5, 15, 28, 0.75),
@@ -38,7 +38,7 @@ a {
 .hero-content {
   width: min(1200px, 92%);
   margin: 0 auto;
-  padding-top: 80px;
+  padding-top: 150px;
   color: white;
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.28);
   position: relative;
@@ -58,6 +58,7 @@ a {
   line-height: 1;
   font-weight: 800;
   margin-bottom: 30px;
+  text-wrap: balance;
 }
 
 .hero h1 span {
@@ -106,9 +107,20 @@ a {
   color: #111827;
 }
 
+.hero-upload-button {
+  display: inline-block;
+  padding: 15px 25px;
+  border: 1px solid rgba(255, 255, 255, .65);
+  color: #fff;
+  cursor: pointer;
+}
+
+.hero-upload-button:hover { background: rgba(255, 255, 255, .14); }
+.hero-upload-button input { display: none; }
+
 .hero-scroll {
   position: absolute;
-  bottom: 30px;
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
 
@@ -1698,4 +1710,34 @@ a {
   color: #819099;
   background: #e8edf0;
   font-size: 12px;
+}
+
+.hero-carousel-controls {
+  position: absolute;
+  right: 4%;
+  bottom: 42px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.hero-carousel-controls > button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, .65);
+  color: #fff;
+  background: rgba(5, 15, 28, .25);
+  cursor: pointer;
+}
+
+.hero-carousel-dots { display: flex; gap: 6px; }
+.hero-carousel-dots button { width: 24px; height: 3px; padding: 0; border: 0; background: rgba(255, 255, 255, .45); cursor: pointer; }
+.hero-carousel-dots button.is-active { background: #fff; }
+
+@media (max-width: 900px) {
+  .hero { min-height: max(700px, 100vh); }
+  .hero-content { padding-top: 120px; }
+  .hero-carousel-controls { right: 4%; bottom: 76px; }
+  .hero-scroll { bottom: 24px; }
 }

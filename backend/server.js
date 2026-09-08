@@ -113,6 +113,9 @@ async function inicializarBaseDeDatos() {
   `);
 
   const configuracionPorDefecto = {
+    slider: {
+      carrusel: true,
+    },
     sitio: {
       empresa: "S&A Santander y Asociados",
       emailNotificaciones: "felipemoralesherrera888@gmail.com",
@@ -237,6 +240,10 @@ function normalizarContenido(body = {}) {
   };
 }
 
+function slugUnicoParaSlider(slug) {
+  return `${slug || "diapositiva"}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
 app.get("/", (req, res) => {
   res.json({
     message: "API S&A Santander y Asociados funcionando correctamente",
@@ -309,6 +316,7 @@ app.get("/api/admin/contenido/:tipo", verificarToken, exigirPermiso("contenido:l
 
 app.post("/api/admin/contenido/:tipo", verificarToken, exigirPermiso("contenido:crear"), validarTipoContenido, async (req, res) => {
   const contenido = normalizarContenido(req.body);
+  if (req.params.tipo === "slider") contenido.slug = slugUnicoParaSlider(contenido.slug);
   if (!tienePermiso(req, "contenido:publicar")) contenido.estado = "Borrador";
   if (!contenido.titulo || !contenido.descripcion) {
     return res.status(400).json({ message: "Título y descripción son obligatorios" });
@@ -336,6 +344,7 @@ app.patch("/api/admin/contenido/:tipo/:id", verificarToken, exigirPermiso("conte
     return res.status(400).json({ message: "El ID del contenido no es válido" });
   }
   const contenido = normalizarContenido(req.body);
+  if (req.params.tipo === "slider") contenido.slug = slugUnicoParaSlider(contenido.slug);
   if (!tienePermiso(req, "contenido:publicar")) contenido.estado = "Borrador";
   try {
     const [result] = await pool.query(
@@ -526,8 +535,8 @@ app.get("/api/admin/configuracion", verificarToken, exigirAdministrador, async (
 });
 
 app.put("/api/admin/configuracion", verificarToken, exigirAdministrador, async (req, res) => {
-  const { sitio, analytics, seo } = req.body || {};
-  const clavesValidas = { sitio, analytics, seo };
+  const { slider, sitio, analytics, seo } = req.body || {};
+  const clavesValidas = { slider, sitio, analytics, seo };
 
   try {
     for (const [clave, valor] of Object.entries(clavesValidas)) {

@@ -746,29 +746,94 @@ function SettingsView() {
 }
 
 function SliderView() {
+  const MAX_SLIDER_IMAGES = 3;
   const defaultSlides = [{ id: "default", titulo: "Ingeniería que construye confianza", subtitulo: "S&A SANTANDER Y ASOCIADOS", descripcion: "Soluciones integrales para proyectos de infraestructura y edificación.", imagen: HERO_FALLBACK_IMAGE, estado: "Publicado" }];
   const [slides, setSlides] = useState(defaultSlides);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [preview, setPreview] = useState(false);
+  const [sliderConfig, setSliderConfig] = useState({ carrusel: true });
+  const [savingConfig, setSavingConfig] = useState(false);
+  const [localSlideImages, setLocalSlideImages] = useState([]);
+  const [processingImages, setProcessingImages] = useState(false);
 
   useEffect(() => {
-    getAdminContent("slider")
-      .then((data) => { if (data.length) setSlides(data); })
+    Promise.all([getAdminContent("slider"), getAdminConfig()])
+      .then(([data, config]) => {
+        if (data.length) setSlides(data);
+        setSliderConfig({ carrusel: config.slider?.carrusel !== false });
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  const saveSlide = (event) => {
+  const toggleCarousel = async (event) => {
+    const nextConfig = { ...sliderConfig, carrusel: event.target.checked };
+    setSliderConfig(nextConfig);
+    setSavingConfig(true);
+    try {
+      await updateAdminConfig({ slider: nextConfig });
+    } catch (error) {
+      setSliderConfig(sliderConfig);
+      window.alert(error.message);
+    } finally {
+      setSavingConfig(false);
+    }
+  };
+
+  const handleLocalSlideImage = (event) => {
+    const files = [...(event.target.files || [])].filter((file) => file.type.startsWith("image/"));
+    if (!files.length) return;
+    setProcessingImages(true);
+
+    Promise.all(files.map((file) => new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const image = new Image();
+        image.onload = () => {
+          const scale = Math.min(1, 1800 / Math.max(image.width, image.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(image.width * scale);
+          canvas.height = Math.round(image.height * scale);
+          canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", 0.8));
+        };
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }))).then((newImages) => {
+      setLocalSlideImages((currentImages) => [...currentImages, ...newImages]);
+      event.target.value = "";
+    }).finally(() => setProcessingImages(false));
+  };
+
+  const saveSlide = async (event) => {
     event.preventDefault();
+    if (processingImages) return;
     const form = new FormData(event.currentTarget);
-    const slide = { titulo: form.get("titulo"), subtitulo: form.get("subtitulo"), descripcion: form.get("descripcion"), imagen: form.get("imagen"), estado: form.get("estado"), orden: slides.length };
+    const baseSlide = { titulo: form.get("titulo"), subtitulo: form.get("subtitulo"), descripcion: form.get("descripcion"), estado: form.get("estado") };
     const isDatabaseSlide = editing?.id && Number.isSafeInteger(Number(editing.id));
-    const saveRequest = isDatabaseSlide ? updateContent("slider", editing.id, slide) : createContent("slider", slide);
-    saveRequest.then((savedSlide) => {
-      setSlides((current) => editing?.id ? current.map((currentSlide) => currentSlide.id === editing.id ? savedSlide : currentSlide) : [...current, savedSlide]);
+    try {
+      if (isDatabaseSlide) {
+        const savedSlide = await updateContent("slider", editing.id, { ...baseSlide, imagen: localSlideImages[0] || form.get("imagen") });
+        setSlides((current) => current.map((currentSlide) => currentSlide.id === editing.id ? savedSlide : currentSlide));
+      } else {
+        const urlImage = String(form.get("imagen") || "").trim();
+        const currentSlideCount = slides.filter((slide) => Number.isSafeInteger(Number(slide.id))).length;
+        const images = [urlImage, ...localSlideImages].filter(Boolean).slice(0, Math.max(0, MAX_SLIDER_IMAGES - currentSlideCount));
+        if (!images.length) throw new Error("El slider ya tiene tres fotos publicadas.");
+        const savedSlides = [];
+        for (const [index, imagen] of (images.length ? images : [""]).entries()) {
+          const savedSlide = await createContent("slider", { ...baseSlide, imagen, orden: slides.length + index });
+          savedSlides.push(savedSlide);
+        }
+        setSlides((current) => [...current, ...savedSlides]);
+      }
+      setLocalSlideImages([]);
       setEditing(null);
-    }).catch((error) => window.alert(error.message));
+    } catch (error) {
+      window.alert(error.message);
+    }
   };
 
   const removeSlide = (id) => deleteContent("slider", id).then(() => setSlides((current) => current.filter((slide) => slide.id !== id))).catch((error) => window.alert(error.message));
@@ -776,9 +841,10 @@ function SliderView() {
   return (
     <>
       <div className="admin-page-heading"><div><span className="admin-eyebrow">HOME / HERO</span><h1>Slider principal</h1><p>Administra las diapositivas que aparecen en la portada pública.</p></div><div className="admin-heading-actions"><button className="admin-secondary-button" onClick={() => setPreview(!preview)}><GalleryHorizontalEnd size={16} /> {preview ? "Cerrar vista previa" : "Vista previa"}</button><button className="admin-primary-button" onClick={() => setEditing({})}><span>+</span> Nueva diapositiva</button></div></div>
+      <div className="admin-slider-setting"><label className="admin-toggle-field"><span><strong>Activar carrusel automático</strong><small>{savingConfig ? "Guardando preferencia..." : "Cambia de diapositiva automáticamente cada 6,5 segundos."}</small></span><input type="checkbox" checked={sliderConfig.carrusel} onChange={toggleCarousel} disabled={savingConfig} /></label></div>
       {preview && <div className="admin-slider-preview" style={{ backgroundImage: `linear-gradient(90deg, rgba(10,28,40,.72), rgba(10,28,40,.16)), url(${slides[0]?.imagen || HERO_FALLBACK_IMAGE})` }}><span>{slides[0]?.subtitulo}</span><h2>{slides[0]?.titulo}</h2><p>{slides[0]?.descripcion}</p></div>}
       {loading ? <div className="admin-empty-state"><RefreshCw className="admin-spin" size={24} /><p>Cargando diapositivas...</p></div> : <div className="admin-slider-list">{slides.map((slide, index) => <article className="admin-slide-card" key={slide.id}><div className="admin-slide-image" style={{ backgroundImage: `url(${slide.imagen || HERO_FALLBACK_IMAGE})` }}><span>SLIDE {String(index + 1).padStart(2, "0")}</span></div><div className="admin-slide-copy"><span className="admin-eyebrow">{slide.subtitulo || "S&A"}</span><h2>{slide.titulo}</h2><p>{slide.descripcion}</p><div><span className="admin-status-pill"><CheckCircle size={13} /> {slide.estado || "Borrador"}</span><button className="admin-row-action" onClick={() => setEditing(slide)}>Editar</button>{slides.length > 1 && Number.isSafeInteger(Number(slide.id)) && <button className="admin-row-action admin-row-delete" onClick={() => removeSlide(slide.id)}><Trash2 size={14} /> Eliminar</button>}</div></div></article>)}</div>}
-      {editing && <div className="admin-modal-backdrop" role="presentation"><section className="admin-editor-modal" role="dialog" aria-modal="true"><div className="admin-editor-heading"><div><span className="admin-eyebrow">SLIDER PRINCIPAL</span><h2>{editing.id ? "Editar diapositiva" : "Nueva diapositiva"}</h2></div><button className="admin-editor-close" onClick={() => setEditing(null)} aria-label="Cerrar editor">×</button></div><form onSubmit={saveSlide}><label className="admin-field"><span>Texto superior</span><input name="subtitulo" defaultValue={editing.subtitulo || "S&A SANTANDER Y ASOCIADOS"} required /></label><label className="admin-field"><span>Título principal</span><input name="titulo" defaultValue={editing.titulo || ""} required /></label><label className="admin-field"><span>Descripción</span><textarea name="descripcion" defaultValue={editing.descripcion || ""} rows="3" required /></label><label className="admin-field"><span>URL de imagen</span><input name="imagen" defaultValue={editing.imagen || ""} placeholder="Opcional: /images/nombre.jpg" /><button type="button" className="admin-remove-image" onClick={(event) => { event.currentTarget.form.imagen.value = ""; }}> <Trash2 size={14} /> Quitar imagen</button></label><label className="admin-field"><span>Estado</span><select name="estado" defaultValue={editing.estado || "Borrador"}><option>Publicado</option><option>Borrador</option></select></label><div className="admin-editor-actions"><button type="button" className="admin-secondary-button" onClick={() => setEditing(null)}>Cancelar</button><button className="admin-primary-button" type="submit">Guardar diapositiva</button></div></form></section></div>}
+      {editing && <div className="admin-modal-backdrop" role="presentation"><section className="admin-editor-modal" role="dialog" aria-modal="true"><div className="admin-editor-heading"><div><span className="admin-eyebrow">SLIDER PRINCIPAL</span><h2>{editing.id ? "Editar diapositiva" : "Nueva diapositiva"}</h2></div><button className="admin-editor-close" onClick={() => setEditing(null)} aria-label="Cerrar editor">×</button></div><form onSubmit={saveSlide}><label className="admin-field"><span>Texto superior</span><input name="subtitulo" defaultValue={editing.subtitulo || "S&A SANTANDER Y ASOCIADOS"} required /></label><label className="admin-field"><span>Título principal</span><input name="titulo" defaultValue={editing.titulo || ""} required /></label><label className="admin-field"><span>Descripción</span><textarea name="descripcion" defaultValue={editing.descripcion || ""} rows="3" required /></label><label className="admin-field"><span>URL de imagen</span><input name="imagen" defaultValue={editing.imagen || ""} placeholder="/images/nombre.jpg o https://..." /><small className="admin-field-help">Puedes usar una imagen local del proyecto o una URL pública.</small></label><label className="admin-upload-field"><span>{editing.id ? "Reemplazar con una imagen local" : `Adjuntar fotos locales (máximo ${MAX_SLIDER_IMAGES})`}</span><input type="file" accept="image/*" multiple={!editing.id} onChange={handleLocalSlideImage} /></label>{processingImages && <small className="admin-field-help">Procesando imágenes, espera un momento...</small>}{localSlideImages.length > 0 && <small className="admin-field-help">{localSlideImages.length} imagen{localSlideImages.length === 1 ? " seleccionada" : "es seleccionadas"} para el carrusel.</small>}<button type="button" className="admin-remove-image" onClick={(event) => { event.currentTarget.form.imagen.value = ""; setLocalSlideImages([]); }}> <Trash2 size={14} /> Quitar imagen{localSlideImages.length > 1 ? "es" : ""}</button><label className="admin-field"><span>Estado</span><select name="estado" defaultValue={editing.estado || "Borrador"}><option>Publicado</option><option>Borrador</option></select></label><div className="admin-editor-actions"><button type="button" className="admin-secondary-button" onClick={() => { setLocalSlideImages([]); setEditing(null); }}>Cancelar</button><button className="admin-primary-button" type="submit" disabled={processingImages}>{processingImages ? "Procesando imágenes..." : `Guardar diapositiva${localSlideImages.length > 1 ? "s" : ""}`}</button></div></form></section></div>}
     </>
   );
 }

@@ -189,8 +189,7 @@ function Experiencia() {
             <div className="experience-grid">
 
               <div>
-                <span>01</span>
-                <h3>Puentes</h3>
+                <h3>PUENTES</h3>
                 <p>
                   Diseño, inspección, evaluación,
                   reforzamiento y ampliación.
@@ -198,8 +197,7 @@ function Experiencia() {
               </div>
 
               <div>
-                <span>02</span>
-                <h3>Infraestructura</h3>
+                <h3>INFRAESTRUCTURA</h3>
                 <p>
                   Intersecciones, vías y diferentes
                   obras civiles.
@@ -207,8 +205,7 @@ function Experiencia() {
               </div>
 
               <div>
-                <span>03</span>
-                <h3>Edificaciones</h3>
+                <h3>EDIFICACIONES</h3>
                 <p>
                   Proyectos residenciales, comerciales,
                   institucionales e industriales.
@@ -216,8 +213,7 @@ function Experiencia() {
               </div>
 
               <div>
-                <span>04</span>
-                <h3>Transporte</h3>
+                <h3>TRANSPORTE</h3>
                 <p>
                   Estructuras relacionadas con sistemas
                   de transporte público.

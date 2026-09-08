@@ -11,11 +11,11 @@ function Nosotros() {
         <section className="page-hero">
           <div className="page-hero-content">
             <span className="section-label">
-              S&A SANTANDER Y ASOCIADOS
+              S&A SANTANDER Y ASOCIADOS SAS
             </span>
 
             <h1>
-              Ingeniería basada en
+              Ingeniería Estructural basada en
               <span> experiencia y confianza.</span>
             </h1>
 
@@ -94,9 +94,8 @@ function Nosotros() {
             <div className="values-grid">
 
               <div className="value-card">
-                <span>01</span>
 
-                <h3>Calidad</h3>
+                <h3>CALIDAD</h3>
 
                 <p>
                   Desarrollamos nuestros proyectos con
@@ -106,9 +105,8 @@ function Nosotros() {
               </div>
 
               <div className="value-card">
-                <span>02</span>
 
-                <h3>Experiencia</h3>
+                <h3>EXPERIENCIA</h3>
 
                 <p>
                   Contamos con profesionales especializados
@@ -117,9 +115,8 @@ function Nosotros() {
               </div>
 
               <div className="value-card">
-                <span>03</span>
 
-                <h3>Confianza</h3>
+                <h3>CONFIANZA</h3>
 
                 <p>
                   Acompañamos a nuestros clientes durante
@@ -128,9 +125,8 @@ function Nosotros() {
               </div>
 
               <div className="value-card">
-                <span>04</span>
 
-                <h3>Soluciones</h3>
+                <h3>SOLUCIONES</h3>
 
                 <p>
                   Buscamos soluciones técnicas eficientes,
@@ -152,9 +148,6 @@ function Nosotros() {
 
             <div className="mission-card">
 
-              <span className="section-label">
-                MISIÓN
-              </span>
 
               <h2>
                 Nuestra misión
@@ -174,10 +167,6 @@ function Nosotros() {
 
 
             <div className="mission-card">
-
-              <span className="section-label">
-                VISIÓN
-              </span>
 
               <h2>
                 Nuestra visión
@@ -205,7 +194,7 @@ function Nosotros() {
           <div className="section-container">
 
             <span className="section-label">
-              NUESTRO EQUIPO
+              EQUIPO S&A
             </span>
 
             <h2>
@@ -215,61 +204,56 @@ function Nosotros() {
             <div className="team-grid">
 
               <div className="team-card">
-                <div className="team-number">01</div>
+
 
                 <h3>
-                  Jorge Santander
+                  Jorge Alfredo Santander Moya
                 </h3>
 
                 <strong>
                   Gerente General
                 </strong>
 
-                <p>
-                  Ingeniero Civil de la Escuela Colombiana
-                  de Ingeniería, con especialización en
-                  patología estructural y experiencia en
-                  diseño de edificaciones.
-                </p>
+    
               </div>
 
 
               <div className="team-card">
-                <div className="team-number">02</div>
-
                 <h3>
-                  Nelson Díaz Cárdenas
+                  Jose Nelson Diaz Cardenas
                 </h3>
 
                 <strong>
                   Director de Proyectos
                 </strong>
 
-                <p>
-                  Ingeniero Civil de la Universidad Nacional
-                  y Magíster en Estructuras de la Universidad
-                  de los Andes, especializado en infraestructura
-                  y obras civiles.
-                </p>
               </div>
 
 
               <div className="team-card">
-                <div className="team-number">03</div>
 
                 <h3>
-                  Luis Fernando Santander
+                  Luis Fernando Santander Moya
                 </h3>
 
                 <strong>
                   Director de Proyectos
                 </strong>
 
-                <p>
-                  Ingeniero Civil de la Escuela Colombiana
-                  de Ingeniería, especializado en estructuras
-                  por la Universidad Politécnica de Cataluña.
-                </p>
+      
+              </div>
+               <div className="team-card">
+
+
+                <h3>
+                  Lizeth Andrea Bautista
+                </h3>
+
+                <strong>
+                  Gerente General
+                </strong>
+
+              
               </div>
 
             </div>

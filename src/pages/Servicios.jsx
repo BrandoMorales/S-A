@@ -4,67 +4,56 @@ import { getPublicContent, resolveImageUrl } from "../utils/contentApi";
 
 const servicios = [
   {
-    numero: "01",
     titulo: "Diseño estructural de intersecciones viales",
     descripcion:
       "Diseño estructural de intersecciones viales en ciudad utilizando diversos sistemas estructurales de concreto o metálicos."
   },
   {
-    numero: "02",
     titulo: "Diseño estructural de puentes",
     descripcion:
       "Diseño estructural de puentes nuevos para vías nacionales o municipales en concreto o estructuras metálicas."
   },
   {
-    numero: "03",
     titulo: "Diseño estructural de edificaciones",
     descripcion:
       "Diseño estructural de edificaciones desarrolladas en sistemas de concreto o estructuras metálicas."
   },
   {
-    numero: "04",
     titulo: "Estructuras para transporte público",
     descripcion:
       "Diseño de estructuras destinadas a sistemas de transporte público y sus diferentes componentes."
   },
   {
-    numero: "05",
     titulo: "Inspección de puentes",
     descripcion:
       "Inspección y evaluación de puentes construidos en concreto y estructuras metálicas."
   },
   {
-    numero: "06",
     titulo: "Vulnerabilidad y reforzamiento de puentes",
     descripcion:
       "Análisis de vulnerabilidad sísmica, reforzamiento y ampliación de puentes."
   },
   {
-    numero: "07",
     titulo: "Puentes peatonales",
     descripcion:
       "Diseño de puentes peatonales en estructura metálica y concreto."
   },
   {
-    numero: "08",
     titulo: "Vulnerabilidad de edificaciones",
     descripcion:
       "Análisis de vulnerabilidad sísmica y diseño de soluciones de reforzamiento para edificaciones."
   },
   {
-    numero: "09",
     titulo: "Edificaciones industriales",
     descripcion:
       "Diseño estructural de edificaciones destinadas a actividades industriales."
   },
   {
-    numero: "10",
     titulo: "Interventoría de obra",
     descripcion:
       "Acompañamiento, seguimiento y control técnico durante la ejecución de proyectos."
   },
   {
-    numero: "11",
     titulo: "Estudios integrales",
     descripcion:
       "Desarrollo y coordinación de estudios estructurales, viales, arquitectónicos, hidráulicos y eléctricos."
@@ -161,7 +150,7 @@ function Servicios() {
 
                 <article
                   className="large-service-card"
-                  key={servicio.numero}
+                  key={servicio.id || servicio.slug || servicio.titulo || index}
                 >
 
                   {servicio.imagen && (
@@ -173,10 +162,6 @@ function Servicios() {
                       />
                     </div>
                   )}
-
-                    <span className="service-number">
-                      {servicio.numero || String(index + 1).padStart(2, "0")}
-                  </span>
 
                   <h3>
                     {servicio.titulo}

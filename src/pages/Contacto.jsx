@@ -190,7 +190,7 @@ function Contacto() {
                 </span>
 
                 <h2>
-                  Estamos aquí para ayudarle
+                 En que podemos ayudarle
                 </h2>
 
                 <p>
@@ -221,11 +221,6 @@ function Contacto() {
 
                   <div>
                     <strong>Teléfono</strong>
-
-                    <p>
-                      6210288
-                    </p>
-
                     <p>
                       311 561 1346
                     </p>
@@ -241,7 +236,7 @@ function Contacto() {
                     <strong>Correo</strong>
 
                     <p>
-                      felipemoralesherrera888@gmail.com
+                      sya@sya.com.co
                     </p>
                   </div>
                 </div>

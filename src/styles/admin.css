@@ -150,6 +150,7 @@
 .admin-user-row time { color: var(--admin-muted); font-size: 11px; }
 .admin-user-row button:disabled, .admin-user-row select:disabled { cursor: not-allowed; opacity: .45; }
 .admin-slider-list { display: grid; gap: 12px; }
+.admin-slider-setting { margin: 0 0 18px; padding: 14px 17px; border: 1px solid var(--admin-line); background: #fff; }
 .admin-slide-card { display: grid; grid-template-columns: 260px 1fr; min-height: 180px; overflow: hidden; border: 1px solid var(--admin-line); border-radius: 5px; background: #fff; }
 .admin-slide-image { min-height: 180px; display: flex; align-items: flex-start; padding: 15px; color: #fff; background: center/cover; }
 .admin-slide-image span { padding: 5px 7px; background: rgba(15,33,46,.7); border-radius: 2px; font-size: 10px; letter-spacing: .1em; }
@@ -201,6 +202,7 @@
 .admin-connection-status.is-muted i { background: #bdc7ca; }
 .admin-field { display: grid; gap: 7px; margin-top: 18px; color: #60717a; font-size: 11px; font-weight: 700; }
 .admin-field em { float: right; color: #a6b1b5; font-size: 10px; font-style: normal; font-weight: 400; }
+.admin-field-help { color: var(--admin-muted); font-size: 10px; font-weight: 400; }
 .admin-field input:not([type="checkbox"]) { width: 100%; min-height: 39px; padding: 0 11px; border: 1px solid var(--admin-line); border-radius: 3px; color: var(--admin-ink); background: #fbfcfc; font: inherit; font-weight: 400; outline: none; }
 .admin-upload-field { display: grid; gap: 7px; margin-top: 12px; color: var(--admin-muted); font-size: 11px; }
 .admin-upload-field input { width: 100%; padding: 9px; border: 1px dashed #b9c9cc; border-radius: 3px; color: var(--admin-muted); background: #f8fbfb; font: inherit; font-size: 11px; }
