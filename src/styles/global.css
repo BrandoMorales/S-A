@@ -647,7 +647,9 @@ a {
 .project-filter button.active,
 .project-filter button:hover {
   background: #1b2638;
-
+  color: white;
+  border-color: #1b2638;
+}
 
 .projects-empty {
   grid-column: 1 / -1;
@@ -655,10 +657,6 @@ a {
   color: #71808a;
   border: 1px dashed #d4dce0;
   text-align: center;
-}
-  color: white;
-
-  border-color: #1b2638;
 }
 
 .projects-grid {

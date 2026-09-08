@@ -1,8 +1,4 @@
-﻿import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from "react-router-dom";
+﻿import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
 import Home from "./pages/Home";
 import Nosotros from "./pages/Nosotros";
@@ -13,10 +9,12 @@ import Noticias from "./pages/Noticias";
 import Contacto from "./pages/Contacto";
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
+import Footer from "./components/Footer";
 
-function App() {
+function AppLayout() {
+  const { pathname } = useLocation();
   return (
-    <BrowserRouter>
+    <>
       <Routes>
 
         <Route
@@ -65,6 +63,15 @@ function App() {
         />
 
       </Routes>
+      {!["/login","/admin"].includes(pathname) && <Footer />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppLayout />
     </BrowserRouter>
   );
 }
