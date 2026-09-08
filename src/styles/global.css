@@ -1773,3 +1773,272 @@ margin: 0 0 8px;
 font-size: 14px;
 font-weight: 600;
 }
+/* =========================
+   NUESTROS CLIENTES
+========================= */
+
+.clients-section {
+  background: #ffffff;
+}
+
+.clients-intro {
+  max-width: 700px;
+  margin: 15px auto 0;
+  line-height: 1.7;
+  color: #666;
+  text-align: center;
+}
+
+.clients-grid {
+  margin-top: 45px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 25px;
+}
+
+.client-card {
+  height: 150px;
+
+  background: #ffffff;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 25px;
+
+  transition: all 0.3s ease;
+}
+
+.client-card:hover {
+  transform: translateY(-5px);
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.client-card img {
+  max-width: 100%;
+  max-height: 90px;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+}
+
+.clients-button-container {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 40px;
+}
+
+.clients-button {
+  border: none;
+
+  padding: 13px 30px;
+
+  border-radius: 6px;
+
+  background: #222;
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+
+.clients-button:hover {
+  transform: translateY(-2px);
+
+  opacity: 0.9;
+}
+
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 900px) {
+
+  .clients-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
+/* =========================
+   CELULAR
+========================= */
+
+@media (max-width: 600px) {
+
+  .clients-grid {
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+  }
+
+  .client-card {
+    height: 130px;
+  }
+
+  .clients-button {
+    width: 100%;
+  }
+
+}
+/* =====================================
+   PRINCIPALES SERVICIOS
+===================================== */
+
+.main-services-section {
+  background: #ffffff;
+  padding: 55px 22px 65px;
+}
+
+.main-services-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.main-services-title {
+  margin: 0 0 35px;
+
+  font-size: 27px;
+  font-weight: 300;
+
+  letter-spacing: 0.2px;
+
+  color: #333;
+}
+
+.main-services-title strong {
+  font-weight: 700;
+}
+
+
+.main-services-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 30px;
+}
+
+
+.main-service-item {
+  display: flex;
+  align-items: center;
+
+  gap: 20px;
+}
+
+
+.main-service-icon {
+  width: 48px;
+  height: 48px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #203e4d;
+
+  color: #ffffff;
+}
+
+
+.main-service-icon svg {
+  width: 27px;
+  height: 27px;
+}
+
+
+.main-service-item span {
+  font-size: 20px;
+  font-weight: 300;
+
+  letter-spacing: 0.5px;
+
+  color: #333;
+}
+
+
+/* =====================================
+   EFECTO HOVER
+===================================== */
+
+.main-service-item {
+  transition: transform 0.25s ease;
+}
+
+.main-service-item:hover {
+  transform: translateX(5px);
+}
+
+.main-service-item:hover .main-service-icon {
+  background: #294f62;
+}
+
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (min-width: 700px) {
+
+  .main-services-list {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 30px;
+  }
+
+}
+
+
+/* =====================================
+   CELULAR
+===================================== */
+
+@media (max-width: 600px) {
+
+  .main-services-section {
+    padding: 45px 20px 50px;
+  }
+
+  .main-services-title {
+    font-size: 24px;
+    margin-bottom: 30px;
+  }
+
+  .main-services-list {
+    gap: 24px;
+  }
+
+  .main-service-item {
+    gap: 15px;
+  }
+
+  .main-service-icon {
+    width: 45px;
+    height: 45px;
+  }
+
+  .main-service-item span {
+    font-size: 18px;
+  }
+
+}
