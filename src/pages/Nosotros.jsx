@@ -188,8 +188,8 @@ function Nosotros() {
 
               <p>
                 La empresa fue constituida en el año 2003 por profesionales
-                con una amplia trayectoria en el desarrollo de proyectos
-                de ingeniería.
+                con una amplia trayectoria en el desarrollo de proyectos de
+                ingeniería.
               </p>
 
               <p>
@@ -197,6 +197,163 @@ function Nosotros() {
                 permitido participar en proyectos de diferentes escalas y
                 complejidades, manteniendo como prioridad la calidad técnica
                 y el acompañamiento permanente al cliente.
+              </p>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        {/* =========================
+            SOCIO FUNDADOR
+        ========================= */}
+
+        <section className="section gray-section">
+
+          <div
+            className="section-container"
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "minmax(320px, 0.85fr) minmax(0, 1.4fr)",
+              gap: "70px",
+              alignItems: "center",
+            }}
+          >
+
+            {/* =========================
+                FOTOS
+            ========================= */}
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "25px",
+              }}
+            >
+
+              {/* FOTO PRINCIPAL */}
+
+              <div
+                style={{
+                  width: "100%",
+                  height: "390px",
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                  background: "#e5e7eb",
+                  boxShadow: "0 15px 35px rgba(0,0,0,0.12)",
+                }}
+              >
+
+                <img
+                  src="public/images/PAPA/IMG_8525.jpg"
+                  alt="Alfredo Santander"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                />
+
+              </div>
+
+
+              {/* SEGUNDA FOTO */}
+
+              <div
+                style={{
+                  width: "100%",
+                  height: "220px",
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                  background: "#e5e7eb",
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.10)",
+                }}
+              >
+
+                <img
+                  src="public/images/PAPA/IMG-6573.JPG"
+                  alt="Reconocimiento de Alfredo Santander"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                  }}
+                />
+
+              </div>
+
+            </div>
+
+
+            {/* =========================
+                INFORMACIÓN DEL FUNDADOR
+            ========================= */}
+
+            <div className="content-text">
+
+              <span className="section-label">
+                A NUESTRO SOCIO FUNDADOR
+              </span>
+
+              <h2
+                style={{
+                  marginTop: "12px",
+                  marginBottom: "25px",
+                }}
+              >
+                Alfredo Santander
+              </h2>
+
+              <p>
+                Alfredo Santander, ingeniero civil graduado de la Universidad
+                Nacional de Colombia con Magister en estructuras de la misma
+                universidad, trabajó en el sector público desde el año 1969
+                hasta el año de 1977, en el ministerio de obras públicas y
+                transporte, Fondo nacional de Caminos Vecinales, siempre
+                dedicado a estudios y diseños.
+              </p>
+
+              <p>
+                Después de 4 años de trabajar como independiente en el diseño
+                de estructuras, en 1981 se asoció con dos ingenieros para
+                fundar Proyectistas Civiles Asociados (PCA), la cual fue una
+                de las principales compañías de Diseño estructural del país.
+              </p>
+
+              <p>
+                Posteriormente en el año 2003 fundó S&A Santander & Asociados
+                LTDA, junto a sus hijos Luis Fernando y Jorge Alfredo y
+                acompañados por los ingenieros Ivonne Avendaño y Nelson Díaz.
+              </p>
+
+              <p>
+                En su carrera profesional hizo el diseño estructural de cientos
+                de puentes a lo largo y ancho del país en todo tipo de sistemas
+                estructurales. Sirvió como perito en varios procesos y es
+                debido a su gran trayectoria profesional y a los aportes
+                importantes que hizo a la ingeniería del país por lo que le
+                otorgaron varios premios.
+              </p>
+
+              <p>
+                Entre los reconocimientos se destacan el Premio Guillermo
+                González Zuleta (2009) de la Sociedad Colombia de Ingenieros,
+                Premio póstumo “Lámpara de Diógenes” (2019) de la Asociación
+                Colombiana de Ingeniería Sísmica – AIS y Docencia Excelente de
+                la Universidad Nacional de Colombia – Sede Bogotá.
+              </p>
+
+              <p>
+                Hoy en día seguimos su legado y continuamos trabajando con la
+                misma pasión, dedicación y ética que nuestro socio fundador
+                nos inculcó y así nos aseguraremos de darle bases sólidas a
+                sus proyectos.
               </p>
 
             </div>
